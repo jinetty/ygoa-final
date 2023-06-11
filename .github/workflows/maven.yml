@@ -18,6 +18,13 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      issues: 'write' #__This fixed the HttpError: Resource not accessible by integration
+      pull-requests: 'write'
+      checks: 'write'
+      packages: 'write'
 
     steps:
     - uses: actions/checkout@v3
@@ -29,3 +36,12 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B test --file KutahyaSecimApi/pom.xml
+
+    name: Add coverage to PR
+    id: jacoco
+    uses: madrapps/jacoco-report@v1.3
+    with:
+      paths: ${{ github.workspace }}/TemelHesaplama/target/site/jacoco/jacoco.xml 
+      token: ${{ secrets.GITHUB_TOKEN }}
+      min-coverage-overall: 40
+      min-coverage-changed-files: 60
